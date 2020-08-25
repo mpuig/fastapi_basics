@@ -21,8 +21,11 @@ class BookRepository(ABC):
 
 
 class InMemoryBookRepository(BookRepository):
-    def __init__(self):
-        self.books = dict()
+    books = dict()
+
+    def __init__(self, initial_books: dict = None):
+        if initial_books is not None:
+            self.books = initial_books
 
     def add(self, new_book: Book) -> BookInDB:
         if not isinstance(new_book, Book):

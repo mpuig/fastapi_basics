@@ -18,7 +18,7 @@ def test_in_memory_repository_initially_empty_successfully():
 
 
 def test_add_valid_data_to_in_memory_repository_successfully(a_book):
-    repo = InMemoryBookRepository()
+    repo = InMemoryBookRepository(initial_books=dict())
     repo.add(a_book)
     items = repo.list()
     assert len(items) == 1
@@ -28,7 +28,7 @@ def test_add_valid_data_to_in_memory_repository_successfully(a_book):
 
 
 def test_add_invalid_data_to_n_memory_repository_raises_exception():
-    repo = InMemoryBookRepository()
+    repo = InMemoryBookRepository(initial_books=dict())
     a_dictionary = dict(title="Foo", author="Boo")
     with pytest.raises(ValueError):
         repo.add(a_dictionary)
@@ -38,7 +38,7 @@ def test_add_invalid_data_to_n_memory_repository_raises_exception():
 
 
 def test_get_book_by_id_from_in_memory_repository_successfully(a_book, another_book):
-    repo = InMemoryBookRepository()
+    repo = InMemoryBookRepository(initial_books=dict())
     book1 = repo.add(a_book)
     book2 = repo.add(another_book)
 
@@ -52,7 +52,7 @@ def test_get_book_by_id_from_in_memory_repository_successfully(a_book, another_b
 
 
 def test_get_book_by_id_from_in_memo_repository_with_invalid_id_returns_none(a_book):
-    repo = InMemoryBookRepository()
+    repo = InMemoryBookRepository(initial_books=dict())
     repo.add(a_book)
 
     invalid_id = UUID('00000000-0000-0000-0000-000000000000')
