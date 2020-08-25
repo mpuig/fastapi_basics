@@ -3,6 +3,7 @@ from uuid import UUID
 
 import pytest
 from fastapi import FastAPI, Depends
+from pydantic.types import PositiveInt
 from starlette.testclient import TestClient
 
 from tests.repositories import InMemoryBookRepository
@@ -39,7 +40,7 @@ def app():
 
     @app.get("/books")
     def get_paginated_books(
-        page_num: int = 1,
+        page_num: PositiveInt = 1,
         book_pagination: BookPaginationService = Depends(BookPaginationService),
     ):
         paginated_books = book_pagination.get_page(num=page_num)
