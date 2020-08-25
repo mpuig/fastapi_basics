@@ -29,8 +29,9 @@ class SQLBookRepository(BookRepository):
         book = self.db.query(BookModel).filter(BookModel.id == str(book_id)).first()
         return BookInDB(**book.__dict__)
 
-    def list(self) -> List[BookInDB]:
-        pass
+    def list(self, skip=0, offset=5) -> List[BookInDB]:
+        books = self.db.query(BookModel).offset(skip).limit(offset).all()
+        return [BookInDB(**book.__dict__) for book in books]
 
 
 Base = declarative_base()
@@ -40,7 +41,7 @@ class BookModel(Base):
     __tablename__ = 'books'
 
     # It is not recommended to store uuid as str, but for these tests is ok
-    id = Column(String, primary_key=True, index=True, default=str(uuid4()))
+    id = Column(String, primary_key=True, index=True, default=lambda x: str(uuid4()))
     title = Column(String)
     author = Column(String)
 
@@ -80,3 +81,14 @@ def test_get_book_from_sql_repository_successfully(db_session: Session, a_book) 
     assert created_book.id == book_from_db.id
     assert a_book.title == book_from_db.title
     assert a_book.author == book_from_db.author
+
+
+def test_get_list_of_books_successfully(db_session: Session) -> None:
+    repo = SQLBookRepository(db_session)
+    for book_id in range(0, 25):
+        book = Book(title=f"title {book_id}", author=f"author {book_id}")
+        repo.add(book=book)
+
+    books_from_db = repo.list()
+    assert books_from_db
+    assert len(books_from_db) == 5
