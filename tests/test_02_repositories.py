@@ -23,6 +23,8 @@ class BookRepository(ABC):
 
 
 class InMemoryBookRepository(BookRepository):
+    books = dict()  # this sets a class-level attribute, common to all instances of `InMemoryBooksRepository`
+
     def add(self, new_book: Book) -> Book:
         pass
 
@@ -30,9 +32,15 @@ class InMemoryBookRepository(BookRepository):
         pass
 
     def list(self) -> List[Book]:
-        pass
+        return [book for book_id, book in self.books.items()]
 
 
 def test_in_memory_repository_created_successfully():
     repo = InMemoryBookRepository()
     assert type(repo) == InMemoryBookRepository
+
+
+def test_in_memory_repository_initially_empty_successfully():
+    repo = InMemoryBookRepository()
+    items = repo.list()
+    assert len(items) == 0
