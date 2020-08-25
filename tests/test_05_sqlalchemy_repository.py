@@ -3,6 +3,7 @@ from typing import List
 from uuid import UUID, uuid4
 
 import pytest
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import Column, String
 from sqlalchemy.engine import Connection, create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -17,7 +18,12 @@ class SQLBookRepository(BookRepository):
         self.db = db
 
     def add(self, book: Book) -> BookInDB:
-        pass
+        book_data = jsonable_encoder(book)
+        book = BookModel(**book_data)
+        self.db.add(book)
+        self.db.commit()
+        self.db.refresh(book)
+        return BookInDB(**book.__dict__)
 
     def get(self, book_id: UUID) -> BookInDB:
         pass
