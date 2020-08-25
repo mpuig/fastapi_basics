@@ -1,49 +1,12 @@
 from contextlib import closing
-from typing import List
-from uuid import UUID, uuid4
 
 import pytest
-from fastapi.encoders import jsonable_encoder
-from sqlalchemy import Column, String
 from sqlalchemy.engine import Connection, create_engine
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
-from tests.repositories import BookRepository
+from tests.models import Base
+from tests.repositories import SQLBookRepository
 from tests.schemas import BookInDB, Book
-
-
-class SQLBookRepository(BookRepository):
-    def __init__(self, db: Session):
-        self.db = db
-
-    def add(self, book: Book) -> BookInDB:
-        book_data = jsonable_encoder(book)
-        book = BookModel(**book_data)
-        self.db.add(book)
-        self.db.commit()
-        self.db.refresh(book)
-        return BookInDB(**book.__dict__)
-
-    def get(self, book_id: UUID) -> BookInDB:
-        book = self.db.query(BookModel).filter(BookModel.id == str(book_id)).first()
-        return BookInDB(**book.__dict__)
-
-    def list(self, skip=0, offset=5) -> List[BookInDB]:
-        books = self.db.query(BookModel).offset(skip).limit(offset).all()
-        return [BookInDB(**book.__dict__) for book in books]
-
-
-Base = declarative_base()
-
-
-class BookModel(Base):
-    __tablename__ = 'books'
-
-    # It is not recommended to store uuid as str, but for these tests is ok
-    id = Column(String, primary_key=True, index=True, default=lambda x: str(uuid4()))
-    title = Column(String)
-    author = Column(String)
 
 
 @pytest.fixture(scope="session")
