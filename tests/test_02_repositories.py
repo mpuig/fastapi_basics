@@ -31,7 +31,8 @@ class BookRepository(ABC):
 
 
 class InMemoryBookRepository(BookRepository):
-    books = dict()  # this sets a class-level attribute, common to all instances of `InMemoryBooksRepository`
+    def __init__(self):
+        self.books = dict()
 
     def add(self, new_book: Book) -> BookInDB:
         if not isinstance(new_book, Book):
