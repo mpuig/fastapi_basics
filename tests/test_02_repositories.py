@@ -20,3 +20,19 @@ class BookRepository(ABC):
     @abstractmethod
     def list(self) -> List[Book]:
         raise NotImplementedError
+
+
+class InMemoryBookRepository(BookRepository):
+    def add(self, new_book: Book) -> Book:
+        pass
+
+    def get(self, book_id: UUID) -> Book:
+        pass
+
+    def list(self) -> List[Book]:
+        pass
+
+
+def test_in_memory_repository_created_successfully():
+    repo = InMemoryBookRepository()
+    assert type(repo) == InMemoryBookRepository
