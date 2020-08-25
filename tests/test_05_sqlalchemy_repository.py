@@ -68,3 +68,14 @@ def test_create_new_book_in_sql_repository_successfully(db_session: Session, a_b
     assert isinstance(created_book, BookInDB)
     assert created_book.title == a_book.title
     assert created_book.author == a_book.author
+
+
+def test_get_book_from_sql_repository_successfully(db_session: Session, a_book) -> None:
+    repo = SQLBookRepository(db_session)
+    created_book = repo.add(book=a_book)
+    book_from_db = repo.get(book_id=created_book.id)
+    assert book_from_db
+    assert isinstance(book_from_db, BookInDB)
+    assert created_book.id == book_from_db.id
+    assert a_book.title == book_from_db.title
+    assert a_book.author == book_from_db.author
