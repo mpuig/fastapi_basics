@@ -59,16 +59,6 @@ def test_in_memory_repository_initially_empty_successfully():
     assert len(items) == 0
 
 
-@pytest.fixture()
-def a_book() -> Book:
-    return Book(title="A nice title", author="John Smith")
-
-
-@pytest.fixture()
-def another_book() -> Book:
-    return Book(title="Another nice title", author="Jane Boo")
-
-
 def test_add_valid_data_to_in_memory_repository_successfully(a_book):
     repo = InMemoryBookRepository()
     repo.add(a_book)
