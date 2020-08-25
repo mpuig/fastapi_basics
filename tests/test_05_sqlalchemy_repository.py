@@ -26,7 +26,8 @@ class SQLBookRepository(BookRepository):
         return BookInDB(**book.__dict__)
 
     def get(self, book_id: UUID) -> BookInDB:
-        pass
+        book = self.db.query(BookModel).filter(BookModel.id == str(book_id)).first()
+        return BookInDB(**book.__dict__)
 
     def list(self) -> List[BookInDB]:
         pass
