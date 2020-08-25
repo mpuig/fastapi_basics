@@ -53,3 +53,10 @@ def test_create_valid_book_successfully(app, client, a_book) -> None:
     assert len(new_book_json['id']) == 36
 
     assert a_book == Book(**new_book_json)
+
+
+def test_invalid_create_book_raises_error(app, client) -> None:
+    url_create_book = app.url_path_for("books:create-book")
+    empty_payload = {}
+    response_new_book = client.post(url_create_book, json=empty_payload)
+    assert response_new_book.status_code == 422
