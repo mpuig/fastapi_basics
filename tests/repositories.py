@@ -37,5 +37,5 @@ class InMemoryBookRepository(BookRepository):
     def get(self, book_id: UUID) -> Optional[BookInDB]:
         return self.books.get(book_id, None)
 
-    def list(self) -> List[BookInDB]:
-        return [book for book_id, book in self.books.items()]
+    def list(self, skip=0, offset=5) -> List[BookInDB]:
+        return list(self.books.values())[skip * offset:(skip + 1) * offset]
