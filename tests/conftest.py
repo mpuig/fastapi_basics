@@ -7,6 +7,7 @@ from starlette.testclient import TestClient
 
 from tests.repositories import InMemoryBookRepository
 from tests.schemas import Book
+from tests.services import BookPaginationService
 
 
 @pytest.fixture
@@ -35,6 +36,14 @@ def app():
     ) -> Book:
         book_db = books_repo.add(book)
         return book_db
+
+    @app.get("/books")
+    def get_paginated_books(
+        page_num: int = 1,
+        book_pagination: BookPaginationService = Depends(BookPaginationService),
+    ):
+        paginated_books = book_pagination.get_page(num=page_num)
+        return paginated_books
 
     return app
 
