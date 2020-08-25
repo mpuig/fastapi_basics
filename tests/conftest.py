@@ -1,6 +1,6 @@
 import pytest
 
-from tests.test_02_repositories import Book
+from tests.schemas import Book
 
 
 @pytest.fixture()
