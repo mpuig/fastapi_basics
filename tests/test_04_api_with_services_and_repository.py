@@ -30,3 +30,18 @@ def test_pagination_service_successfully(app, client, page_num, results_count, e
     assert content["page"] == page_num
     assert "content" in content
     assert len(content["content"]) == results_count
+
+
+@pytest.mark.parametrize(
+    "page_num, expected_status", (
+        (-1, 422),
+        (0, 422),
+        ('0', 422),
+        ('a', 422),
+    ),
+)
+def test_pagination_service_fails(app, client, page_num, expected_status) -> None:
+    app.dependency_overrides[InMemoryBookRepository] = get_repo_test
+
+    response = client.get(f"/books?page_num={page_num}")
+    assert response.status_code == expected_status
