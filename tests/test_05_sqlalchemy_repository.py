@@ -1,9 +1,11 @@
 from contextlib import closing
 from typing import List
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
+from sqlalchemy import Column, String
 from sqlalchemy.engine import Connection, create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
 from tests.repositories import BookRepository
@@ -24,12 +26,26 @@ class SQLBookRepository(BookRepository):
         pass
 
 
+Base = declarative_base()
+
+
+class BookModel(Base):
+    __tablename__ = 'books'
+
+    # It is not recommended to store uuid as str, but for these tests is ok
+    id = Column(String, primary_key=True, index=True, default=str(uuid4()))
+    title = Column(String)
+    author = Column(String)
+
+
 @pytest.fixture(scope="session")
 def db_connection() -> Connection:
     db_url = "sqlite:///:memory:?check_same_thread=False"
     engine = create_engine(db_url, pool_pre_ping=True)
     with engine.connect() as connection:
+        Base.metadata.create_all(bind=connection)
         yield connection
+        Base.metadata.drop_all(bind=connection)
 
 
 @pytest.fixture(scope="function")
