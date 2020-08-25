@@ -1,11 +1,23 @@
+from typing import List
+
 import pytest
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
+
+from tests.repositories import InMemoryBookRepository
+from tests.schemas import Book
 
 
 @pytest.fixture
 def app():
     app = FastAPI()
+
+    @app.get("/", name="books:get-all-books")
+    def get_all_books(
+        books_repo: InMemoryBookRepository = Depends(InMemoryBookRepository)
+    ) -> List[Book]:
+        books = books_repo.list()
+        return books
 
     return app
 
