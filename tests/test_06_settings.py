@@ -18,6 +18,18 @@ def tmp_settings_file(tmp_settings_dir):
     yield file_path
 
 
+@pytest.fixture
+def dummy_env(tmp_settings_dir):
+    file_path = os.path.join(tmp_settings_dir, 'dummy_test.env')
+    with open(file_path, "w") as f:
+        f.write("DUMMY_VALUE = 99\n")
+    os.environ["DUMMY_ENV_FOR_TEST"] = "dummy_test"
+    try:
+        yield
+    finally:
+        del os.environ["DUMMY_ENV_FOR_TEST"]
+
+
 # https://pydantic-docs.helpmanual.io/usage/settings/
 class Settings(BaseSettings):
     dummy_value: int = 0
@@ -52,6 +64,12 @@ def get_mandatory_environment_variable(environment_variable_name: str) -> str:
     return value
 
 
+def load_settings_from_environment(environment_name: str, settings_dir: str = None) -> Settings:
+    environment_value = get_mandatory_environment_variable(environment_name).strip().lower()
+    config_file = os.path.join(settings_dir, f"{environment_value}.env")
+    return load_settings_from_file(config_file)
+
+
 def test_load_settings_from_file_successfully(tmp_settings_file: str):
     settings = load_settings_from_file(tmp_settings_file)
     assert settings.dummy_value == 1
@@ -80,3 +98,13 @@ def test_get_valid_mandatory_environment_variable_successfully():
         )
     finally:
         del os.environ[an_environment_var]
+
+
+def test_load_settings_from_environment_variable_successfully(tmp_settings_dir, dummy_env):
+    settings = load_settings_from_environment("DUMMY_ENV_FOR_TEST", tmp_settings_dir)
+    assert settings.dummy_value == 99
+
+
+def test_load_settings_from_nonexistent_environment_variable_raises_exception():
+    with pytest.raises(MandatoryEnvironmentVariableNotDefinedException):
+        load_settings_from_environment("NONEXISTENT_ENV")
