@@ -1,3 +1,5 @@
+import os
+import tempfile
 from typing import List
 from uuid import UUID
 
@@ -62,3 +64,28 @@ def a_book() -> Book:
 @pytest.fixture()
 def another_book() -> Book:
     return Book(title="Another nice title", author="Jane Boo")
+
+
+@pytest.fixture(scope="session")
+def tmp_settings_dir():
+    yield tempfile.mkdtemp()
+
+
+@pytest.fixture
+def tmp_settings_file(tmp_settings_dir):
+    file_path = os.path.join(tmp_settings_dir, 'dummy.env')
+    with open(file_path, "w") as f:
+        f.write("DUMMY_VALUE = 1\n")
+    yield file_path
+
+
+@pytest.fixture
+def dummy_env(tmp_settings_dir):
+    file_path = os.path.join(tmp_settings_dir, 'dummy_test.env')
+    with open(file_path, "w") as f:
+        f.write("DUMMY_VALUE = 99\n")
+    os.environ["DUMMY_ENV_FOR_TEST"] = "dummy_test"
+    try:
+        yield
+    finally:
+        del os.environ["DUMMY_ENV_FOR_TEST"]
